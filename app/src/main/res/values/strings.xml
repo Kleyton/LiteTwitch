@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Lite Twitch</string>
     <string name="action_settings">Settings</string>
+    <string name="account_name">Account Name</string>
+    <string name="description">To get started with the application, introduce the account name which you use to login to twitch</string>
+    <string name="submit">Submit</string>
 </resources>
