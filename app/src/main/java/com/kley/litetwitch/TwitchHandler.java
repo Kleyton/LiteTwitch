@@ -45,22 +45,32 @@ public class TwitchHandler {
     private static final String REQUEST_ACCEPT_KEY = "Accept";
     private static final String REQUEST_ACCEPT_VALUE = "application/vnd.twitchtv.v5+json";
 
-    public TwitchHandler() {
+    //Singleton for application wide requests
+    private static TwitchHandler INSTANCE;
 
+    public static TwitchHandler getInstance() {
+        if(INSTANCE == null) {
+            INSTANCE = new TwitchHandler();
+        }
+        return INSTANCE;
     }
 
-    public void testAPICall() {
-        final AsyncTask<Void, Void,Void> backendCall = new TwitchTask();
-        backendCall.execute();
+    private TwitchHandler() {
+        //TODO: Do we require any setup over here?
     }
 
-    private static class TwitchTask extends AsyncTask<Void, Void, Void> {
+    public void testAPICall(String accountName) {
+        final AsyncTask<String, Void,Void> backendCall = new TwitchTask();
+        backendCall.execute(accountName);
+    }
+
+    private static class TwitchTask extends AsyncTask<String, Void, Void> {
 
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected Void doInBackground(String... voids) {
             URL url = null;
             try {
-                url = new URL(URL_API_ROOT + URL_API_USERS + "?login=mystial"); //TODO: Put your account name here to get the id
+                url = new URL(URL_API_ROOT + URL_API_USERS + "?login=" + voids[0]); //TODO: Put your account name here to get the id
                 //url = new URL("https://api.twitch.tv/kraken/users/<>/follows/channels");
                 //url = new URL("https://api.twitch.tv/kraken/users?login=<>");
                 HttpsURLConnection httpURLConnection = (HttpsURLConnection) url.openConnection();

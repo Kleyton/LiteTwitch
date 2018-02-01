@@ -16,23 +16,43 @@
 
 package com.kley.litetwitch;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
+    private final static String TAG = MainActivity.class.getSimpleName();
+
+    private final String SHARED_PREFS_ACCOUNT_ID = "account_id";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.splash_screen);
+        setContentView(R.layout.content_main);
+        if(findViewById(R.id.fragment_container) != null) {
+            if(savedInstanceState != null) {
+                return;
+            }
+
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            if (prefs.contains(SHARED_PREFS_ACCOUNT_ID)) {
+                //TODO: Go directly to main screen here...
+            } else {
+                //setContentView(R.layout.splash_screen);
+                //EditText accountEditText = findViewById(R.id.account_name);
+                SplashScreenFragment splashScreen = new SplashScreenFragment();
+
+                getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, splashScreen).commit();
+            }
+
+            // TODO: Commented out for now!
+        /*
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // TODO: Commented out for now!
-        /*
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -42,13 +62,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         */
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        TwitchHandler handler = new TwitchHandler();
-        handler.testAPICall();
+        //TwitchHandler.getInstance().testAPICall("mystial");
     }
 
     @Override
