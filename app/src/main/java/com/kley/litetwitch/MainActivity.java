@@ -26,7 +26,7 @@ import android.view.MenuItem;
 public class MainActivity extends AppCompatActivity {
     private final static String TAG = MainActivity.class.getSimpleName();
 
-    private final String SHARED_PREFS_ACCOUNT_ID = "account_id";
+    public final String SHARED_PREFS_ACCOUNT_ID = "account_id";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

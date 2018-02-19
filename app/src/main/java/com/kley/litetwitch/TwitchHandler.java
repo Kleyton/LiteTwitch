@@ -87,6 +87,7 @@ public class TwitchHandler {
                 while ((inputStr = streamReader.readLine()) != null)
                     responseStrBuilder.append(inputStr);
                 Log.i(TAG, "Response of client: " + responseStrBuilder.toString());
+                TwitchResponseParser.UserResponse response = TwitchResponseParser.UserResponse.fromResponse(responseStrBuilder.toString());
                 httpURLConnection.disconnect();
             } catch (MalformedURLException e) {
                 e.printStackTrace();

@@ -4,4 +4,5 @@
     <string name="account_name">Account Name</string>
     <string name="description">To get started with the application, introduce the account name which you use to login to twitch</string>
     <string name="submit">Submit</string>
+    <string name="placeholder">This is a placeholder string for previewing.</string>
 </resources>
