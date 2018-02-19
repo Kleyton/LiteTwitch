@@ -38,6 +38,8 @@ public class TwitchHandler {
 
     private static final String URL_API_ROOT = "https://api.twitch.tv/kraken";
     private static final String URL_API_USERS = "/users";
+    private static final String URL_API_FOLLOWS = "/follows";
+    private static final String URL_API_CHANNELS = "/channels";
     // Replace with your own, public information
     private static final String CLIENT_ID = "hdq1rch45i7l69bosgaub3wdmwdxbn";
 
@@ -70,7 +72,7 @@ public class TwitchHandler {
         protected Void doInBackground(String... voids) {
             URL url = null;
             try {
-                url = new URL(URL_API_ROOT + URL_API_USERS + "?login=" + voids[0]); //TODO: Put your account name here to get the id
+                url = new URL(URL_API_ROOT + URL_API_USERS + "?login=" + voids[0]); //Note: Put your account name here to get the id
                 //url = new URL("https://api.twitch.tv/kraken/users/<>/follows/channels");
                 //url = new URL("https://api.twitch.tv/kraken/users?login=<>");
                 HttpsURLConnection httpURLConnection = (HttpsURLConnection) url.openConnection();
@@ -86,9 +88,35 @@ public class TwitchHandler {
                 String inputStr;
                 while ((inputStr = streamReader.readLine()) != null)
                     responseStrBuilder.append(inputStr);
-                Log.i(TAG, "Response of client: " + responseStrBuilder.toString());
+                Log.i(TAG, "Response#1 of client: " + responseStrBuilder.toString());
                 TwitchResponseParser.UserResponse response = TwitchResponseParser.UserResponse.fromResponse(responseStrBuilder.toString());
                 httpURLConnection.disconnect();
+
+                // Get the list of follows for the user...
+                String id = response.getUserId();
+                if(id != null) {
+                    url = new URL(URL_API_ROOT + URL_API_USERS + "/" + id + URL_API_FOLLOWS + URL_API_CHANNELS);
+                    httpURLConnection = (HttpsURLConnection) url.openConnection();
+                    // Set appropriate headers
+                    httpURLConnection.setRequestProperty(REQUEST_ACCEPT_KEY, REQUEST_ACCEPT_VALUE);
+                    httpURLConnection.setRequestProperty(REQUEST_CLIENT_KEY, CLIENT_ID);
+                    httpURLConnection.setRequestMethod("GET");
+                    inputStream = httpURLConnection.getInputStream();
+                    // Read the response... if the InputStream comes back as null that's a not found error
+                    // TODO: Handle said error, right now it's caught by the try/catch block
+                    streamReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+                    responseStrBuilder = new StringBuilder(2048);
+                    while ((inputStr = streamReader.readLine()) != null)
+                        responseStrBuilder.append(inputStr);
+                    //Log.i(TAG, "Response#2 of client: " + responseStrBuilder.toString());
+                    TwitchResponseParser.ChannelResponse channelResponse = TwitchResponseParser.ChannelResponse.fromResponse(responseStrBuilder.toString());
+                    Log.i(TAG, "Channels: " + channelResponse);
+                    TwitchHandler.channelResponse = channelResponse;
+                }
+                else {
+                    Log.e(TAG, "User id " + id + " does not exist");
+                }
+
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (FileNotFoundException e) {
@@ -99,4 +127,7 @@ public class TwitchHandler {
             return null;
         }
     }
+
+    // Find somewhere to fit this... probably need a callback mechanism
+    public static TwitchResponseParser.ChannelResponse channelResponse;
 }

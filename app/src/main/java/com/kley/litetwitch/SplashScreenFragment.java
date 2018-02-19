@@ -18,6 +18,8 @@ package com.kley.litetwitch;
 
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -37,10 +39,12 @@ public class SplashScreenFragment extends Fragment {
 
     private EditText accountEditText;
     private Button submitButton;
+    private SplashScreenFragment fragment;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.i(TAG, "Inflating view");
+        fragment = this;
         return inflater.inflate(R.layout.splash_screen, container, false);
     }
 
@@ -59,6 +63,12 @@ public class SplashScreenFragment extends Fragment {
             Log.i(TAG, "I was pressed!");
             Log.i(TAG, "Current text is " + accountEditText.getText());
             TwitchHandler.getInstance().testAPICall(accountEditText.getText().toString());
+            FragmentManager manager = getActivity().getSupportFragmentManager();
+            FragmentTransaction trans = manager.beginTransaction();
+            MainListFragment mainListFragment = new MainListFragment();
+            trans.remove(fragment);
+            trans.add(R.id.fragment_container, mainListFragment);
+            trans.commit();
         }
     }
 

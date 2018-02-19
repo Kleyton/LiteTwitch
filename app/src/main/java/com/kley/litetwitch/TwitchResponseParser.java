@@ -24,9 +24,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Takes the JSON response from an API request to twitch and strips it down to accessible elements.
@@ -111,5 +115,43 @@ public class TwitchResponseParser {
         public String getUserDisplayName() { return display_name; }
         public String getUserLogo() { return logo; }
         public String getUserName() { return name; }
+    }
+
+    public static class ChannelResponse {
+        private ChannelResponse() {}
+        public static List<TwitchChannel> channels = new ArrayList<>();
+
+        public static ChannelResponse fromResponse(String jsonResponse) {
+            JsonParser parser = new JsonParser();
+            JsonObject response = parser.parse(jsonResponse).getAsJsonObject();
+            JsonArray follows = response.getAsJsonArray("follows");
+            for(JsonElement element : follows) {
+                Log.i(TAG, "Channel = " + element);
+                JsonObject jsonChannels = element.getAsJsonObject();
+                JsonObject jsonChannel = jsonChannels.getAsJsonObject("channel");
+                TwitchChannel channel = new TwitchChannel();
+                JsonElement displayChannel = jsonChannel.get("display_name");
+                JsonElement logoChannel = jsonChannel.get("logo");
+                JsonElement titleChannel = jsonChannel.get("status");
+                channel.channelName = displayChannel.getAsString();
+                channel.iconURL = logoChannel.getAsString();
+                channel.channelTitle = titleChannel.getAsString();
+                channels.add(channel);
+            }
+            return new ChannelResponse();
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            builder.append("\n");
+            for(TwitchChannel channel : channels) {
+                builder
+                .append("Channel: ").append(channel.channelName).append("\n")
+                .append("DisplayName: ").append(channel.channelTitle).append("\n")
+                .append("Logo: ").append(channel.iconURL).append("\n");
+            }
+            return builder.toString();
+        }
     }
 }
